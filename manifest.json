@@ -1,0 +1,13 @@
+{
+    "domain": "styled_stack_card_manager",
+    "name": "Styled Stack Card Manager",
+    "version": "1.0.0",
+    "documentation": "https://github.com/Mariocoleguilla/styled-stack-card",
+    "dependencies": [],
+    "codeowners": [
+        "@Mariocoleguilla"
+    ],
+    "requirements": [],
+    "iot_class": "local_push",
+    "version_requirements": ">=2024.1.0"
+}
