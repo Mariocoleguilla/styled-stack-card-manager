@@ -1,0 +1,1 @@
+# styled-stack-card-manager
