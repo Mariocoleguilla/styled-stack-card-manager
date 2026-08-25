@@ -1,0 +1,13 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Añadir Styled Stack Card Manager",
+                "description": "Pulsa 'Enviar' para instalar y configurar la integración en tu Home Assistant."
+            }
+        },
+        "abort": {
+            "single_instance_allowed": "La integración ya está configurada. Solo se permite una instalación por sistema."
+        }
+    }
+}
