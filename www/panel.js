@@ -17,20 +17,15 @@ class StyledStackCardPanel extends LitElement {
     this._resetCurrentData();
   }
 
-  // Se ejecuta al cargar el panel en pantalla
   connectedCallback() {
     super.connectedCallback();
-
-    // Forzamos la carga del archivo de presets para leer lo que ya hay guardado
     const script = document.createElement('script');
-    // Usamos Date.now() para evitar que el navegador guarde el archivo en caché
     script.src = `/local/styled-stack-card-presets/styled-stack-card-presets.js?t=${Date.now()}`;
     script.onload = () => {
       if (window.StyledStackCustomPresets) {
         this.presets = { ...window.StyledStackCustomPresets };
       }
     };
-    // Si da error (el archivo no existe aún), no pasa nada
     document.head.appendChild(script);
   }
 
@@ -45,7 +40,6 @@ class StyledStackCardPanel extends LitElement {
   }
 
   // --- Helpers de conversión rgba <-> [R,G,B] + alpha ---
-
   _parseRgbaString(value) {
     if (!value) return { rgb: [128, 128, 128], alpha: 100 };
     const match = value.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)/);
@@ -91,7 +85,6 @@ class StyledStackCardPanel extends LitElement {
   }
 
   // --- Manejadores de eventos ---
-
   _handlePresetSelect(ev) {
     const selected = ev.target.value;
     if (!selected) {
@@ -99,7 +92,6 @@ class StyledStackCardPanel extends LitElement {
       this._resetCurrentData();
     } else {
       this._presetName = selected;
-      // Hacemos una copia profunda (spread) para no modificar el original hasta guardar
       this._currentData = { ...this.presets[selected] };
     }
   }
@@ -161,7 +153,6 @@ class StyledStackCardPanel extends LitElement {
   }
 
   // --- Funciones del backend ---
-
   async guardarPresets() {
     if (!this._presetName.trim()) {
       alert("Por favor, introduce un nombre para el preset.");
@@ -186,8 +177,35 @@ class StyledStackCardPanel extends LitElement {
     }
   }
 
-  // --- Renderizado ---
+  // ¡NUEVA FUNCIÓN! Para eliminar presets
+  async eliminarPreset() {
+    if (!this.presets[this._presetName]) return;
 
+    if (!confirm(`¿Estás seguro de que deseas eliminar el preset '${this._presetName}'?`)) {
+      return;
+    }
+
+    const presetsActuales = { ...this.presets };
+    delete presetsActuales[this._presetName]; // Borramos la clave del objeto
+
+    try {
+      await this.hass.callWS({
+        type: "styled_stack_card/save_presets",
+        presets: presetsActuales // Enviamos la lista sin el preset
+      });
+
+      this.presets = { ...presetsActuales };
+      this._presetName = "";
+      this._resetCurrentData();
+      alert(`Preset eliminado correctamente.`);
+
+    } catch (err) {
+      console.error("Error al eliminar", err);
+      alert("Hubo un error al eliminar el preset.");
+    }
+  }
+
+  // --- Renderizado ---
   _renderColorRow(label, field, rgb, alpha, opts) {
     const solidColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
     const previewColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${(alpha / 100).toFixed(2)})`;
@@ -245,6 +263,9 @@ class StyledStackCardPanel extends LitElement {
       ? `linear-gradient(${data.angle}deg, ${this._rgbToRgbaString(data.color_start_rgb, data.color_start_alpha)} 0%, ${this._rgbToRgbaString(data.color_mid_rgb, data.color_mid_alpha)} ${data.color_mid_pos}%, ${this._rgbToRgbaString(data.color_end_rgb, data.color_end_alpha)} 100%)`
       : `linear-gradient(${data.angle}deg, ${this._rgbToRgbaString(data.color_start_rgb, data.color_start_alpha)} 0%, ${this._rgbToRgbaString(data.color_end_rgb, data.color_end_alpha)} 100%)`;
 
+    // Comprobamos si el nombre actual existe en los presets guardados
+    const isExistingPreset = Object.keys(this.presets).includes(this._presetName);
+
     return html`
       <div class="manager-container">
         <div class="header">
@@ -256,10 +277,10 @@ class StyledStackCardPanel extends LitElement {
           <!-- Selector de presets existentes -->
           <div class="form-group">
             <label>1. Cargar un preset (Opcional)</label>
-            <select class="custom-input" @change=${this._handlePresetSelect}>
+            <select class="custom-input" .value=${this._presetName} @change=${this._handlePresetSelect}>
               <option value="">-- Crear Nuevo Preset --</option>
               ${Object.keys(this.presets).map(
-      key => html`<option value="${key}" ?selected=${this._presetName === key}>${key}</option>`
+      key => html`<option value="${key}">${key}</option>`
     )}
             </select>
           </div>
@@ -302,58 +323,39 @@ class StyledStackCardPanel extends LitElement {
           </div>
         </div>
 
-        <button class="btn-save" @click=${this.guardarPresets}>Guardar Preset</button>
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="action-buttons">
+          <button class="btn-save" @click=${this.guardarPresets}>Guardar Preset</button>
+          
+          ${isExistingPreset ? html`
+            <button class="btn-delete" @click=${this.eliminarPreset}>Eliminar Preset</button>
+          ` : ""}
+        </div>
       </div>
     `;
   }
 
   static get styles() {
     return css`
-      .manager-container {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 24px;
-        color: var(--primary-text-color);
-      }
-      .header {
-        margin-bottom: 24px;
-      }
+      .manager-container { max-width: 600px; margin: 0 auto; padding: 24px; color: var(--primary-text-color); }
+      .header { margin-bottom: 24px; }
       .header h2 { margin: 0 0 8px 0; }
       .header p { margin: 0; color: var(--secondary-text-color); }
       
-      .form-row-group {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-        margin-bottom: 24px;
-      }
-      @media (max-width: 500px) {
-        .form-row-group { grid-template-columns: 1fr; }
-      }
-
-      .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .form-group label {
-        font-weight: bold;
-        font-size: 0.9em;
-      }
-      .custom-input {
-        padding: 12px;
-        font-size: 16px;
-        border: 1px solid var(--divider-color);
-        border-radius: 8px;
-        background: var(--card-background-color);
-        color: var(--primary-text-color);
-        width: 100%;
-        box-sizing: border-box;
-      }
+      .form-row-group { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+      @media (max-width: 500px) { .form-row-group { grid-template-columns: 1fr; } }
+      .form-group { display: flex; flex-direction: column; gap: 8px; }
+      .form-group label { font-weight: bold; font-size: 0.9em; }
+      .custom-input { padding: 12px; font-size: 16px; border: 1px solid var(--divider-color); border-radius: 8px; background: var(--card-background-color); color: var(--primary-text-color); width: 100%; box-sizing: border-box; }
       
-      .btn-save {
-        width: 100%;
+      /* --- Estilos para los botones de acción --- */
+      .action-buttons {
+        display: flex;
+        gap: 12px;
         margin-top: 24px;
+      }
+      .btn-save {
+        flex: 1;
         padding: 14px;
         font-size: 16px;
         font-weight: bold;
@@ -366,17 +368,25 @@ class StyledStackCardPanel extends LitElement {
       }
       .btn-save:hover { opacity: 0.9; }
 
-      .angle-container {
-        background: var(--secondary-background-color);
-        border: 1px solid var(--divider-color);
-        border-radius: 10px;
-        padding: 12px;
+      .btn-delete {
+        flex: 1;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: bold;
+        background: var(--error-color, #f44336);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: opacity 0.2s;
       }
+      .btn-delete:hover { opacity: 0.9; }
 
+      .angle-container { background: var(--secondary-background-color); border: 1px solid var(--divider-color); border-radius: 10px; padding: 12px; }
       ha-form { display: block; }
       ha-selector { display: block; }
 
-      /* --- CSS ORIGINAL DE LA TARJETA --- */
+      /* --- CSS ORIGINAL --- */
       .gradient-section { display: flex; flex-direction: column; gap: 10px; }
       .gradient-preview-wrap { border-radius: 10px; overflow: hidden; border: 1px solid var(--divider-color); }
       .gradient-preview { height: 56px; width: 100%; transition: background 0.35s ease; }
