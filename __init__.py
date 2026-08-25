@@ -1,21 +1,25 @@
 import os
 import json
-from homeassistant.components import panel_custom, websocket_api
+from homeassistant.components import panel_custom, websocket_api, frontend
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.components.http import StaticPathConfig  # <-- NUEVA IMPORTACIÓN
+from homeassistant.components.http import StaticPathConfig
 
 DOMAIN = "styled_stack_card_manager"
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry): 
-    # 1. Registrar el panel en la barra lateral usando el método asíncrono moderno
+    # 1. Registrar el panel en la barra lateral
     url_path = "/styled_stack_card_manager_ui"
     file_path = hass.config.path(f"custom_components/{DOMAIN}/www/panel.js")
     
     await hass.http.async_register_static_paths([
-        StaticPathConfig(url_path, file_path, False) # False = sin caché (ideal para desarrollo)
+        StaticPathConfig(url_path, file_path, False)
     ])
     
+    # ¡NUEVO! Comprobación de seguridad: Si el panel ya estaba cargado, lo quitamos antes de poner el nuevo
+    if "styled-stack-card-manager" in hass.data.get("frontend_panels", {}):
+        frontend.async_remove_panel(hass, "styled-stack-card-manager")
+        
     await panel_custom.async_register_panel(
         hass,
         frontend_url_path="styled-stack-card-manager",
@@ -45,7 +49,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         await hass.async_add_executor_job(write_file)
         connection.send_result(msg["id"], {"success": True})
 
-    # Registramos el websocket
-    hass.components.websocket_api.async_register_command(handle_save_presets)
+    websocket_api.async_register_command(hass, handle_save_presets)
 
+    return True
+
+# ¡NUEVO! Función obligatoria para limpiar cuando se borra/recarga la integración
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+    # Quitamos el panel de la barra lateral al desinstalar
+    frontend.async_remove_panel(hass, "styled-stack-card-manager")
     return True
