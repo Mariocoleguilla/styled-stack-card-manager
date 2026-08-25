@@ -24,7 +24,7 @@ class StyledStackCardPanel extends LitElement {
     // Forzamos la carga del archivo de presets para leer lo que ya hay guardado
     const script = document.createElement('script');
     // Usamos Date.now() para evitar que el navegador guarde el archivo en caché
-    script.src = `/local/styled-stack-presets/styled-stack-presets.js?t=${Date.now()}`;
+    script.src = `/local/styled-stack-card-presets/styled-stack-card-presets.js?t=${Date.now()}`;
     script.onload = () => {
       if (window.StyledStackCustomPresets) {
         this.presets = { ...window.StyledStackCustomPresets };

@@ -39,10 +39,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         presets_data = msg["presets"]
         
         js_content = f"window.StyledStackCustomPresets = {json.dumps(presets_data, indent=2)};"
-        file_path_js = hass.config.path("www", "styled-stack-presets.js")
+        
+        # AQUÍ ESTÁ LA CLAVE: 3 parámetros (carpeta base, subcarpeta, nombre del archivo)
+        file_path_js = hass.config.path("www", "styled-stack-card-presets", "styled-stack-card-presets.js")
         
         def write_file():
-            os.makedirs(os.path.dirname(file_path_js), exist_ok=True)
+            # Esto sacará la ruta de la carpeta (/config/www/styled-stack-card-presets)
+            folder_path = os.path.dirname(file_path_js)
+            # Esto crea la subcarpeta si no existe
+            os.makedirs(folder_path, exist_ok=True)
+            
+            # Esto crea y escribe el archivo .js dentro
             with open(file_path_js, "w", encoding="utf-8") as f:
                 f.write(js_content)
                 
