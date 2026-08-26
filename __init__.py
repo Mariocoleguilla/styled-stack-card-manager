@@ -25,7 +25,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         frontend_url_path="styled-stack-card-manager",
         webcomponent_name="styled-stack-card-panel",
         sidebar_title="Styled Stack Card",
-        sidebar_icon="mdi:view-dashboard-variant",
+        sidebar_icon="mdi:gradient-horizontal",
         module_url="/styled_stack_card_manager_ui"
     )
 
