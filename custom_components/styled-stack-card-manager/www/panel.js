@@ -169,6 +169,8 @@ class StyledStackCardPanel extends LitElement {
       });
 
       this.presets = { ...presetsActuales };
+      window.StyledStackCustomPresets = JSON.parse(JSON.stringify(presetsActuales));
+      window.dispatchEvent(new CustomEvent("styled-stack-card-presets-updated", { detail: presetsActuales }));
       alert(`¡Preset '${this._presetName}' guardado correctamente!`);
 
     } catch (err) {
@@ -195,6 +197,8 @@ class StyledStackCardPanel extends LitElement {
       });
 
       this.presets = { ...presetsActuales };
+      window.StyledStackCustomPresets = JSON.parse(JSON.stringify(presetsActuales));
+      window.dispatchEvent(new CustomEvent("styled-stack-card-presets-updated", { detail: presetsActuales }));
       this._presetName = "";
       this._resetCurrentData();
       alert(`Preset eliminado correctamente.`);

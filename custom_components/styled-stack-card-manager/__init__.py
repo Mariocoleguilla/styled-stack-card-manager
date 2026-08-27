@@ -16,7 +16,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         StaticPathConfig(url_path, file_path, False)
     ])
     
-    # ¡NUEVO! Comprobación de seguridad: Si el panel ya estaba cargado, lo quitamos antes de poner el nuevo
+    # Comprobación de seguridad: Si el panel ya estaba cargado, lo quitamos antes de poner el nuevo
     if "styled-stack-card-manager" in hass.data.get("frontend_panels", {}):
         frontend.async_remove_panel(hass, "styled-stack-card-manager")
         
@@ -40,28 +40,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         
         js_content = f"window.StyledStackCustomPresets = {json.dumps(presets_data, indent=2)};"
         
-        # AQUÍ ESTÁ LA CLAVE: 3 parámetros (carpeta base, subcarpeta, nombre del archivo)
         file_path_js = hass.config.path("www", "styled-stack-card-presets", "styled-stack-card-presets.js")
         
         def write_file():
-            # Esto sacará la ruta de la carpeta (/config/www/styled-stack-card-presets)
             folder_path = os.path.dirname(file_path_js)
-            # Esto crea la subcarpeta si no existe
             os.makedirs(folder_path, exist_ok=True)
             
-            # Esto crea y escribe el archivo .js dentro
             with open(file_path_js, "w", encoding="utf-8") as f:
                 f.write(js_content)
                 
         await hass.async_add_executor_job(write_file)
+
+        # Notificar a todas las tarjetas/sesiones activas vía evento en el bus de HA
+        hass.bus.async_fire("styled_stack_card_presets_updated", {"presets": presets_data})
+
         connection.send_result(msg["id"], {"success": True})
 
     websocket_api.async_register_command(hass, handle_save_presets)
 
     return True
 
-# ¡NUEVO! Función obligatoria para limpiar cuando se borra/recarga la integración
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
-    # Quitamos el panel de la barra lateral al desinstalar
     frontend.async_remove_panel(hass, "styled-stack-card-manager")
     return True

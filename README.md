@@ -1,98 +1,88 @@
+<h1 align="center">🎛 Styled Stack Card Manager</h1>
+
 <p align="center">
-  <h1 align="center">🎨 Styled Stack Card Manager</h1>
-  <p align="center">
-    A Home Assistant custom integration that provides a dedicated sidebar panel to create, edit, preview, and manage custom gradient presets for <b>Styled Stack Card</b>.
-  </p>
+  <em>A Home Assistant custom integration that adds a sidebar panel to create, preview, and manage reusable gradient presets for <a href="https://github.com/Mariocoleguilla/styled-stack-card">Styled Stack Card</a>.</em>
 </p>
 
 <p align="center">
-  <a href="https://github.com/hacs/default">
-    <img src="https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge&logo=homeassistant" alt="HACS Badge">
-  </a>
-  <a href="https://github.com/Mariocoleguilla/styled-stack-card-manager/releases">
-    <img src="https://img.shields.io/github/v/release/Mariocoleguilla/styled-stack-card-manager?style=for-the-badge&color=orange" alt="Release">
-  </a>
-  <a href="https://github.com/Mariocoleguilla/styled-stack-card-manager/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/Mariocoleguilla/styled-stack-card-manager?style=for-the-badge&color=blue" alt="License">
-  </a>
+  <a href="https://github.com/hacs/default"><img src="https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge&logo=homeassistant" alt="HACS Custom"></a>
+  <a href="https://github.com/Mariocoleguilla/styled-stack-card-manager/releases"><img src="https://img.shields.io/github/v/release/Mariocoleguilla/styled-stack-card-manager?style=for-the-badge&color=orange" alt="Release"></a>
+  <a href="https://github.com/Mariocoleguilla/styled-stack-card-manager/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Mariocoleguilla/styled-stack-card-manager?style=for-the-badge&color=blue" alt="License"></a>
+  <img src="https://img.shields.io/badge/Type-Integration-purple?style=for-the-badge" alt="Type: Integration">
+</p>
+
+<p align="center">
+  <strong>Companion card:</strong> <a href="https://github.com/Mariocoleguilla/styled-stack-card">Styled Stack Card</a> — the Lovelace card that consumes the presets created here.
 </p>
 
 ---
 
 ## 📌 Overview
 
-**Styled Stack Card Manager** is a Home Assistant custom integration designed to complement [Styled Stack Card](https://github.com/Mariocoleguilla/styled-stack-card).
+**Styled Stack Card Manager** is the companion integration for [Styled Stack Card](https://github.com/Mariocoleguilla/styled-stack-card).
 
-It adds a dedicated UI panel to your Home Assistant sidebar, allowing you to visually design custom 2-color or 3-color linear gradient presets. Presets are saved via Home Assistant WebSockets directly into `/config/www/styled-stack-card-presets/styled-stack-card-presets.js`, where they are automatically available across your entire dashboard!
+It registers a dedicated **sidebar panel** in Home Assistant where you can visually design 2- or 3-color linear gradient presets. Presets are persisted to disk and **synchronised in real time** with every `styled-stack-card` instance on your dashboard — no page refresh or cache clearing needed.
 
 ---
 
 ## ✨ Features
 
-- 🎛 **Sidebar Panel**: Access a dedicated manager UI right from your Home Assistant sidebar (`mdi:gradient-horizontal`).
-- 🎨 **Visual Preset Editor**: Design custom gradients with interactive color pickers, opacity sliders, position controls, and angle adjustments.
-- 🌈 **3-Color Stop Support**: Configure Start, optional Middle (with % position), and End colors.
-- ⚡ **WebSocket File Storage**: Saves presets automatically to `/config/www/styled-stack-card-presets/styled-stack-card-presets.js` using HA's native WebSocket API.
-- 🔄 **Instant Synchronization**: Presets created in the manager immediately appear in `styled-stack-card`'s visual editor dropdown menu.
-- 🌐 **Fully Local**: 100% local execution (`local_push`).
+| | Feature |
+|---|---|
+| 🎛 | **Sidebar panel** — accessible from the HA sidebar with the `mdi:gradient-horizontal` icon |
+| 🎨 | **Visual preset editor** — interactive color pickers, opacity sliders, angle & position controls |
+| 🌈 | **3-color stop support** — start, optional middle (with % position), and end |
+| 💾 | **Persistent storage** — presets saved to `/config/www/styled-stack-card-presets/styled-stack-card-presets.js` via WebSocket API |
+| ⚡ | **Real-time sync** — presets appear instantly in every `styled-stack-card` dropdown without reloading |
+| 🗑 | **Create & delete** — manage your preset library from the panel |
+| 🌐 | **100 % local** — no cloud, no external dependencies (`local_push`) |
 
 ---
 
 ## 📋 Requirements
 
-- **Home Assistant**: `2024.1.0` or newer
-- **Styled Stack Card**: Custom dashboard card installed via HACS ([Repository](https://github.com/Mariocoleguilla/styled-stack-card))
+- **Home Assistant** `2024.1.0` or newer.
+- **[Styled Stack Card](https://github.com/Mariocoleguilla/styled-stack-card)** installed (HACS → Frontend).
 
 ---
 
 ## 🚀 Installation
 
-### Option 1: HACS (Recommended)
+### HACS (Recommended)
 
-1. Open **HACS** in your Home Assistant.
-2. Click **Integrations** → Click **⋮ (top right) → Custom repositories**.
-3. Add Repository URL:
-   ```
-   https://github.com/Mariocoleguilla/styled-stack-card-manager
-   ```
-   Category:
-   ```
-   Integration
-   ```
-4. Click **Download** and restart Home Assistant.
-5. In Home Assistant, go to **Settings → Devices & Services → Add Integration**.
-6. Search for **Styled Stack Card Manager** and click to complete setup.
+1. Open **HACS** → **Integrations**.
+2. Click **⋮** (top right) → **Custom repositories**.
+3. Add:
+   | Field | Value |
+   |---|---|
+   | **Repository** | `https://github.com/Mariocoleguilla/styled-stack-card-manager` |
+   | **Category** | `Integration` |
+4. Find **Styled Stack Card Manager** in the list → **Download**.
+5. **Restart** Home Assistant.
+6. Go to **Settings → Devices & Services → Add Integration** → search **Styled Stack Card Manager**.
 
----
+### Manual
 
-### Option 2: Manual Installation
-
-1. Copy the `styled_stack_card_manager` directory into your Home Assistant's `custom_components/` folder:
+1. Copy the `styled-stack-card-manager` folder into `config/custom_components/`:
    ```
-   config/custom_components/styled_stack_card_manager/
+   config/custom_components/styled-stack-card-manager/
    ```
-2. Restart Home Assistant.
-3. Go to **Settings → Devices & Services → Add Integration** and select **Styled Stack Card Manager**.
+2. **Restart** Home Assistant.
+3. **Settings → Devices & Services → Add Integration** → **Styled Stack Card Manager**.
 
 ---
 
 ## 📖 How It Works
 
-1. Once installed, click **Styled Stack Card** in your Home Assistant sidebar.
-2. Use the panel interface to create or edit gradient presets (set name, colors, alpha, angle, and optional mid-stop).
-3. Click **Save Presets**. The integration writes the configuration to:
-   ```
-   /config/www/styled-stack-card-presets/styled-stack-card-presets.js
-   ```
-4. When editing any card in your dashboard using `styled-stack-card`, your custom presets will automatically appear in the preset dropdown (e.g. `✨ Chicle`).
+1. Click **Styled Stack Card** in the HA sidebar.
+2. Design your gradient — choose name, colors, opacity, angle, and optional middle stop.
+3. Click **Guardar Preset** — the integration writes the JS file and fires a real-time event.
+4. Every `styled-stack-card` on your dashboard picks up the new preset **instantly** — it appears in the preset dropdown as `✨ <name>`.
 
----
-
-## ⚙️ Configuration Example
-
-Generated JS preset file format:
+### Generated file format
 
 ```javascript
+// /config/www/styled-stack-card-presets/styled-stack-card-presets.js
 window.StyledStackCustomPresets = {
   "Chicle": {
     "color_start": "rgba(255, 64, 255, 0.60)",
@@ -104,20 +94,59 @@ window.StyledStackCustomPresets = {
 };
 ```
 
+To use a preset in YAML:
+
+```yaml
+type: custom:styled-stack-card
+style_config:
+  preset: "Chicle"
+cards:
+  - type: tile
+    entity: light.living_room
+```
+
+---
+
+## 🔗 Related
+
+| Repository | Type | Description |
+|---|---|---|
+| **[styled-stack-card](https://github.com/Mariocoleguilla/styled-stack-card)** | Dashboard (Frontend) | Lovelace card — gradient stacks |
+| **[styled-stack-card-manager](https://github.com/Mariocoleguilla/styled-stack-card-manager)** | Integration | This integration — preset manager sidebar panel |
+
+---
+
+## ❓ FAQ
+
+<details>
+<summary><strong>Do I need to restart HA after creating a preset?</strong></summary>
+No. Presets sync in real time via WebSocket events and are available immediately in every <code>styled-stack-card</code> editor and card instance.
+</details>
+
+<details>
+<summary><strong>Can I install this without Styled Stack Card?</strong></summary>
+The integration will work, but the presets it generates are designed to be consumed by <a href="https://github.com/Mariocoleguilla/styled-stack-card">Styled Stack Card</a>. Install both for the full experience.
+</details>
+
+<details>
+<summary><strong>Where are presets stored?</strong></summary>
+<code>/config/www/styled-stack-card-presets/styled-stack-card-presets.js</code> — a plain JavaScript file that sets <code>window.StyledStackCustomPresets</code>.
+</details>
+
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE).
 
 ---
 
-## ⭐ Support the Project
-
-If this integration helps you manage and design your Home Assistant dashboards, consider giving the repository a **star** on GitHub!
+<p align="center">
+  <strong>If this integration improves your dashboard workflow, give the repo a ⭐!</strong>
+</p>
 
 <p align="center">
   <a href="https://www.paypal.com/donate/?hosted_button_id=C6T54AXECTX9L">
-    <img src="https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Donate via PayPal" />
+    <img src="https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Donate via PayPal"/>
   </a>
 </p>
