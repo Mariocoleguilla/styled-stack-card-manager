@@ -33,7 +33,7 @@ It registers a dedicated **sidebar panel** in Home Assistant where you can visua
 | 🎨 | **Visual preset editor** — interactive color pickers, opacity sliders, angle & position controls |
 | 🌈 | **3-color stop support** — start, optional middle (with % position), and end |
 | 💾 | **Persistent storage** — presets saved to `/config/www/styled-stack-card-presets/styled-stack-card-presets.js` via WebSocket API |
-| ⚡ | **Real-time sync** — presets appear instantly in every `styled-stack-card` dropdown without reloading |
+| ⚡ | **Real-time sync** — presets appear instantly in every `styled-stack-card` dropdown without reloading, for admins **and non-admin users** |
 | 🗑 | **Create & delete** — manage your preset library from the panel |
 | 🌐 | **100 % local** — no cloud, no external dependencies (`local_push`) |
 
@@ -78,6 +78,15 @@ It registers a dedicated **sidebar panel** in Home Assistant where you can visua
 2. Design your gradient — choose name, colors, opacity, angle, and optional middle stop.
 3. Click **Guardar Preset** — the integration writes the JS file and fires a real-time event.
 4. Every `styled-stack-card` on your dashboard picks up the new preset **instantly** — it appears in the preset dropdown as `✨ <name>`.
+
+### WebSocket API
+
+| Command | Who can use it | Description |
+|---|---|---|
+| `styled_stack_card/save_presets` | Any authenticated user | Saves the full presets dict (`presets` is required) and notifies subscribers. |
+| `styled_stack_card/subscribe_presets` | Any authenticated user | Subscription. Sends the current presets right away and then every change, as `{"presets": {...}}`. |
+
+Home Assistant only lets non-admin users subscribe to an allowlist of built-in events with `subscribe_events`, so the card uses `styled_stack_card/subscribe_presets` instead (requires Styled Stack Card with the shared presets subscription). The internal `styled_stack_card_presets_updated` bus event is still fired for older card versions.
 
 ### Generated file format
 
