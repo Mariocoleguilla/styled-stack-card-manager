@@ -1,7 +1,7 @@
 {
     "domain": "styled_stack_card_manager",
     "name": "Styled Stack Card Manager",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "documentation": "https://github.com/Mariocoleguilla/styled-stack-card",
     "dependencies": [],
     "codeowners": [
